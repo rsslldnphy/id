@@ -23,7 +23,7 @@ module Id
       end
 
       def presence_of(data)
-        data.has_key?(key) && !data.fetch(key).nil?
+        data.has_key?(key) && data.fetch(key)
       end
 
       def cast(value)
