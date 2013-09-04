@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'date'
 
 class OptionalModel
   include Id::Model
@@ -15,6 +16,7 @@ class TestModel
 
   field :foo
   field :bar, :key => 'baz'
+  field :baz
   field :qux, :optional => true
   field :quux, :default => false
   field :date_of_birth, :optional => true, :type => Date
@@ -148,9 +150,10 @@ describe Id::Model do
 
   describe "#fields are present methods" do
     it 'allows you to check if fields are present' do
-      model = TestModel.new(:foo => 1)
+      model = TestModel.new(:foo => 1, :baz => false)
       model.foo?.should be_true
       model.bar?.should be_false
+      model.baz?.should be_false
     end
   end
 
