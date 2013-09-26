@@ -21,6 +21,10 @@ module Id
         self
       end
 
+      def to_partial_path
+        model.respond_to?(:to_partial_path) ? model.to_partial_path : super
+      end
+
       private
 
       def method_missing(name, *args, &block)
