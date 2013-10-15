@@ -1,12 +1,5 @@
 module Id::Model
 
-  module InstanceMethods
-    def initialize(data)
-      @data = data
-    end
-    attr_reader :data
-  end
-
   def self.included(base)
     warn "[DEPRECATION] Including `Id::Model` is deprecated; please extend it instead."
     base.extend(self) # for backwards compatibility
@@ -16,10 +9,18 @@ module Id::Model
     base.send(:include, InstanceMethods)
   end
 
-  def field(name)
-    send :define_method, name do
-      data.fetch(name)
+  module InstanceMethods
+    def initialize(_data = {})
+      @_data = _data
     end
+
+    def data
+      @data ||= _data.reduce({}) { |acc, (k, v)| acc.merge(k.to_s => v) }
+    end
+
+    private
+    attr_reader :_data
   end
 
+  include Id::Field
 end
