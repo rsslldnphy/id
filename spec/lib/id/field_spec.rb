@@ -34,7 +34,7 @@ describe Id::Field do
       expect(c.cats).to eq 7
     end
 
-    it 'runs lamda defaults at the point of first access of the field' do
+    it 'runs lambda defaults at the point of first access of the field' do
       c = Class.new { include Id::Model ; field :time, default: -> { Time.now } }.new
       d = Class.new { include Id::Model ; field :time, default: -> { Time.now } }.new
       t1 = c.time; sleep 0.0001; t2 = d.time

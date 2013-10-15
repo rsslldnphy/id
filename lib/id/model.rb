@@ -14,5 +14,6 @@ module Id::Model
   def self.included(base)
     base.send :extend, Id::Field
     base.send :extend, Id::Association
+    base.send :extend, Id::EtaExpansion
   end
 end
