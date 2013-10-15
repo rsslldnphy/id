@@ -1,16 +1,15 @@
 module Id::Model
 
-  def initialize(_data = {})
-    @_data = _data
+  def initialize(data = {})
+    @data = Id::Hashify.enhash(data)
   end
 
-  def to_hash
-    Id::Hashify.enhash(_data)
+  def set(update)
+    self.class.new data.merge(update)
   end
-  alias_method :data, :to_hash
 
-  private
-  attr_reader :_data
+  attr_reader :data
+  alias_method :to_hash, :data
 
   def self.included(base)
     base.send :extend, Id::Field
