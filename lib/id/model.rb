@@ -4,9 +4,10 @@ module Id::Model
     @_data = _data
   end
 
-  def data
-    @data ||= _data.reduce({}) { |acc, (k, v)| acc.merge(k.to_s => v) }
+  def to_hash
+    Id::Hashify.enhash(_data)
   end
+  alias_method :data, :to_hash
 
   private
   attr_reader :_data

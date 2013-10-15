@@ -17,7 +17,7 @@ describe Id::Coercion do
     expect { Id::Coercion.coerce(2, Proc) }.to raise_error Id::CoercionError
   end
 
-  it 'can coerce data into Id::Models' do
+  it 'can coerce data into id models' do
     c = Class.new { include Id::Model ; field :cats }
     coerced = Id::Coercion.coerce({cats: 3}, c)
     expect(coerced.cats).to eq 3

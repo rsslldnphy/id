@@ -5,12 +5,12 @@ module Id::Field
       memoized = instance_variable_get "@#{name}"
       return memoized unless memoized.nil?
 
-      key     = options.fetch(:key, name.to_s)
+      key     = options.fetch(:key, name).to_sym
       type    = options.fetch(:type, Object)
       default = options.fetch(:default, nil)
       default = default.call if default.is_a? Proc
 
-      value = data.fetch(key, default)
+      value = _data[key] || _data[key.to_s] || default
       fail Id::MissingAttributeError, [self, name] if value.nil?
 
       value = Id::Coercion.coerce(value, type)
