@@ -18,7 +18,7 @@ describe Id::Coercion do
   end
 
   it 'can coerce data into Id::Models' do
-    c = Class.new { extend Id::Model ; field :cats }
+    c = Class.new { include Id::Model ; field :cats }
     coerced = Id::Coercion.coerce({cats: 3}, c)
     expect(coerced.cats).to eq 3
   end

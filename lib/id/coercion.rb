@@ -8,7 +8,7 @@ module Id::Coercion
 
   def coerce(value, type)
     return value if value.is_a? type
-    return type.new(value) if type.is_a? Id::Model
+    return type.new(value) if type.include? Id::Model
 
     coercion = coercions.fetch([value.class, type], false)
     fail Id::CoercionError, [value.class, type] unless coercion
