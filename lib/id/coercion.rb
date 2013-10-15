@@ -7,6 +7,7 @@ module Id::Coercion
   end
 
   def coerce(value, type)
+    return (value || []).map { |v| coerce(v, type.first) } if type.is_a? Array
     return value if value.is_a? type
     return type.new(value) if type.include? Id::Model
 

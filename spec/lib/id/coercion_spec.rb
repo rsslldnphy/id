@@ -22,4 +22,11 @@ describe Id::Coercion do
     coerced = Id::Coercion.coerce({cats: 3}, c)
     expect(coerced.cats).to eq 3
   end
+
+  it 'can coerce arrays of a type' do
+    c = Class.new { include Id::Model }
+    coerced = Id::Coercion.coerce([{},{},{}], Array[c])
+    expect(coerced).to have(3).items
+    coerced.each { |item| expect(item).to be_a c }
+  end
 end
