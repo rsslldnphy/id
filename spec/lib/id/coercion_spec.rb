@@ -29,4 +29,10 @@ describe Id::Coercion do
     expect(coerced).to have(3).items
     coerced.each { |item| expect(item).to be_a c }
   end
+
+  it 'can coerce optional types' do
+    c = Class.new { include Id::Model; field :foot, optional: true, type: Integer }
+    expect(c.new.foot).to be_none
+    expect(c.new(foot: '4').foot).to eq Some[4]
+  end
 end
