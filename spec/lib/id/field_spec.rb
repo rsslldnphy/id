@@ -13,6 +13,15 @@ describe Id::Field do
     expect { c.cats }.to raise_error Id::MissingAttributeError, "TestClass had a nil value for 'cats'."
   end
 
+  describe 'type coercion' do
+
+    it 'can coerce basic types' do
+      c = Class.new { extend Id::Model ; field :cats, type: Integer }.new(cats: "3")
+      expect(c.cats).to eq 3
+    end
+
+  end
+
   describe 'defaults' do
 
     it 'can be initialised with a default value' do
