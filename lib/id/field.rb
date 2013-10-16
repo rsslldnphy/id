@@ -4,14 +4,18 @@ module Id::Field
     definition = Definition.new(name, options)
     define_field!(definition)
     define_predicate!(definition)
-    fields << definition
+    fields[name] = definition
   end
 
   def fields
-    @fields ||= []
+    @fields ||= {}
   end
 
   private
+
+  def self.extended(base)
+    base.send(:define_method, :fields) { self.class.fields }
+  end
 
   def define_field!(definition)
     send :define_method, definition.name do

@@ -55,4 +55,8 @@ describe Id::Field do
     expect(d.foo?).to be_true
   end
 
+  it 'makes the fields of the model enumerable' do
+    c = Class.new { include Id::Model ; field :foo }.new
+    expect(c.fields.keys.map(&:to_s).map(&:upcase)).to eq ["FOO"]
+  end
 end
