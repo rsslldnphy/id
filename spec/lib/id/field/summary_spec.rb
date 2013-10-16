@@ -11,7 +11,7 @@ module Id::Field
       summary = definition.to_s
       expect(summary).to eq "Name:\t\tcats\n"   +
                             "Type:\t\tString\n" +
-                            "Key:\t\tkittens\n" +
+                            "Key in hash:\tkittens\n" +
                             "Optional:\ttrue\n" +
                             "Default:\tLambda"
     end

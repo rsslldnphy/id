@@ -16,4 +16,3 @@ require 'id/field'
 require 'id/association'
 require 'id/eta_expansion'
 require 'id/model'
-

@@ -20,7 +20,7 @@ module Id::Field
     end
 
     def key
-      "Key:\t\t#{definition.key}" unless definition.key == definition.name.to_s
+      "Key in hash:\t#{definition.key}" unless definition.key == definition.name.to_s
     end
 
     def optional

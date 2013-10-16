@@ -10,7 +10,7 @@ describe Id::Field do
   it 'blows up with an informative error if you try to request a nil value' do
     class TestClass; include Id::Model; field :cats end
     c = TestClass.new
-    expect { c.cats }.to raise_error Id::MissingAttributeError, "TestClass had a nil value for 'cats'."
+    expect { c.cats }.to raise_error Id::MissingAttributeError, /TestClass had a nil value for 'cats'./
   end
 
   describe 'type coercion' do
