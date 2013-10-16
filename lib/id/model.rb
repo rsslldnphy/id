@@ -5,7 +5,24 @@ module Id::Model
   end
 
   def set(update)
-    self.class.new data.merge(update)
+    update  = Id::Hashify.enhash(update)
+    updated = data.merge(update)
+    self.class.new(updated)
+  end
+
+  def unset(*fields)
+    fields  = fields.map(&:to_s)
+    updated = data.except(*fields)
+    self.class.new(updated)
+  end
+
+  def eql? other
+    other.is_a?(Id::Model) && other.data.eql?(self.data)
+  end
+  alias_method :==, :eql?
+
+  def hash
+    data.hash
   end
 
   attr_reader :data

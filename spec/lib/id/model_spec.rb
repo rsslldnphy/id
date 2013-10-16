@@ -14,4 +14,33 @@ describe Id::Model do
     expect(c.cats).to eq 3
     expect(d.cats).to eq 4
   end
+
+  it 'can have fields removed from it after creation - creating a new instance' do
+    c = Class.new { include Id::Model ; field :cats }.new(cats: 3)
+    expect(c.cats).to eq 3
+    d = c.unset(:cats)
+    expect(c.cats).to eq 3
+    expect { d.cats }.to raise_error Id::MissingAttributeError
+  end
+
+  it 'is equal to models with the same data' do
+    c = Class.new { include Id::Model ; field :cats }.new(cats: 3)
+    d = Class.new { include Id::Model ; field :cats }.new(cats: 3)
+    expect(c).to eq d
+  end
+
+  it 'is not equal to models with different data' do
+    c = Class.new { include Id::Model ; field :cats }.new(cats: 3)
+    d = Class.new { include Id::Model ; field :cats }.new(cats: 4)
+    expect(c).not_to eq d
+  end
+
+  it 'can be used as keys in a hash' do
+    c = Class.new { include Id::Model ; field :cats }.new(cats: 3)
+    d = Class.new { include Id::Model ; field :cats }.new(cats: 3)
+    e = Class.new { include Id::Model ; field :cats }.new(cats: 4)
+    hash = { c => 10, e => 12 }
+    expect(hash[d]).to eq 10
+    expect(hash[e]).to eq 12
+  end
 end
