@@ -1,7 +1,6 @@
 class Id::ActiveModel
-  include ActiveModel::Validations
   include ActiveModel::Conversion
-  extend  ActiveModel::Naming
+  include ActiveModel::Validations
 
   def self.i18n_scope
     :id
@@ -12,11 +11,7 @@ class Id::ActiveModel
   end
 
   def persisted?
-    false
-  end
-
-  def to_model
-    self
+    true
   end
 
   def to_partial_path
@@ -30,7 +25,8 @@ class Id::ActiveModel
   private
 
   def method_missing(name, *args, &block)
-    model.send(name, *args, &block)
+    field = model.fields[name]
+    field.nil? ? model.send(name, *args, &block) : model.data[field.key]
   end
 
   attr_reader :model
