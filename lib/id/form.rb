@@ -9,14 +9,17 @@ module Id::Form
     to_model
   end
 
-  private
+  delegate :valid?, :errors, to: :active_model
 
-  # Please, someone tell me how this can be made nicer as it makes me
-  # want to puke everywhere :-(
+  private
+  def form_class
+    self.class.form_class
+  end
+
   def self.included(base)
-    base.send(:extend, ActiveModel::Naming)
-    base.send(:include, ActiveModel::Conversion)
-    base.send(:alias_method, :to_model, :active_model)
+    base.send :include, ActiveModel::Conversion
+    base.send :extend,  ActiveModel::Naming, Id::Validations
+    base.send :alias_method, :to_model, :active_model
 
     base.define_singleton_method :form_class do
       base = self
@@ -25,10 +28,6 @@ module Id::Form
         eigenclass.send(:define_method, :model_name, &base.method(:model_name))
       end
     end
-  end
-
-  def form_class
-    self.class.form_class
   end
 
 end

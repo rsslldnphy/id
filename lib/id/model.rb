@@ -29,8 +29,6 @@ module Id::Model
   alias_method :to_hash, :data
 
   def self.included(base)
-    base.send :extend, Id::Field
-    base.send :extend, Id::Association
-    base.send :extend, Id::EtaExpansion
+    base.send :extend, Id::Field, Id::Association, Id::EtaExpansion
   end
 end
