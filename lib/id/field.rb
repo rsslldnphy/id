@@ -1,37 +1,37 @@
 module Id::Field
 
   def field(name, options = {})
-    define_field!(name, options)
-    define_predicate!(name)
+    definition = Definition.new(name, options)
+    define_field!(definition)
+    define_predicate!(definition)
+    fields << definition
+  end
+
+  def fields
+    @fields ||= []
   end
 
   private
 
-  def define_field!(name, options)
-    send :define_method, name do
-      memoized = instance_variable_get "@#{name}"
+  def define_field!(definition)
+    send :define_method, definition.name do
+      memoized = instance_variable_get "@#{definition.name}"
       return memoized unless memoized.nil?
 
-      key      = options.fetch(:key, name.to_s)
-      type     = options.fetch(:type, Object)
+      value = data.fetch(definition.key, definition.default!)
+      value = Option[value] if definition.optional?
 
-      default  = options.fetch(:default, nil)
-      default  = default.call if default.is_a? Proc
+      fail Id::MissingAttributeError, [self, definition] if value.nil?
 
-      value = data.fetch(key, default)
-      value = Option[value] if options.fetch(:optional, false)
-
-      fail Id::MissingAttributeError, [self, name] if value.nil?
-
-      value = Id::Coercion.coerce(value, type)
-      value.tap { |value| instance_variable_set "@#{name}", value }
+      value = Id::Coercion.coerce(value, definition.type)
+      value.tap { |value| instance_variable_set "@#{definition.name}", value }
     end
   end
 
-  def define_predicate!(name)
-    send :define_method, "#{name}?" do
+  def define_predicate!(definition)
+    send :define_method, "#{definition.name}?" do
       begin
-        value = send(name)
+        value = send(definition.name)
         !!value && !value.is_a?(None)
       rescue Id::MissingAttributeError
         false
@@ -42,7 +42,7 @@ module Id::Field
 end
 
 class Id::MissingAttributeError < StandardError
-  def initialize((model, name))
-    super "#{model.class.name} had a nil value for '#{name}'."
+  def initialize((model, field))
+    super "#{model.class.name} had a nil value for '#{field.name}'."
   end
 end

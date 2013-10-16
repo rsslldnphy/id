@@ -20,5 +20,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "mocha"
   s.add_development_dependency "simplecov"
   s.add_development_dependency "coveralls"
+  s.add_development_dependency "test-unit"
+
 
 end
