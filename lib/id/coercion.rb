@@ -31,5 +31,8 @@ class Id::CoercionError < StandardError
   end
 end
 
-Id::Coercion.register String, Integer, &:to_i
-Id::Coercion.register String, Float,   &:to_f
+Id::Coercion.register String, Integer,     &:to_i
+Id::Coercion.register String, Float,       &:to_f
+Id::Coercion.register String, Date,        &Date.method(:parse)
+Id::Coercion.register String, Time,        &Time.method(:parse)
+Id::Coercion.register String, Id::Boolean, &Id::Boolean.method(:parse)

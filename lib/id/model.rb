@@ -1,11 +1,11 @@
 module Id::Model
 
   def initialize(data = {})
-    @data = Id::Hashify.enhash(data)
+    @data = Id::Hashifier.enhash(data)
   end
 
   def set(update)
-    update  = Id::Hashify.enhash(update)
+    update  = Id::Hashifier.enhash(update)
     updated = data.merge(update)
     self.class.new(updated)
   end

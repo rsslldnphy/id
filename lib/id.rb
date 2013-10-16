@@ -7,8 +7,9 @@ require 'active_support/core_ext/hash/except'
 
 require 'optional'
 
+require 'id/boolean'
 require 'id/coercion'
-require 'id/hashify'
+require 'id/hashifier'
 require 'id/field'
 require 'id/association'
 require 'id/eta_expansion'

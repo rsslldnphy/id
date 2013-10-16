@@ -1,4 +1,4 @@
-module Id::Hashify
+module Id::Hashifier
   extend self
 
   def enhash(value)

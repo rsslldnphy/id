@@ -2,7 +2,7 @@ module Id::Field
 
   def field(name, options = {})
     define_field!(name, options)
-    define_existence_check!(name)
+    define_predicate!(name)
   end
 
   private
@@ -28,9 +28,14 @@ module Id::Field
     end
   end
 
-  def define_existence_check!(name)
+  def define_predicate!(name)
     send :define_method, "#{name}?" do
-      !send(name).is_a? None rescue false
+      begin
+        value = send(name)
+        !!value && !value.is_a?(None)
+      rescue Id::MissingAttributeError
+        false
+      end
     end
   end
 

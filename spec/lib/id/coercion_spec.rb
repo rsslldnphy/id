@@ -7,6 +7,21 @@ describe Id::Coercion do
     expect(coerced).to eq 2
   end
 
+  it 'can coerce strings into dates' do
+    coerced = Id::Coercion.coerce("01/01/2001", Date)
+    expect(coerced).to eq Date.new(2001, 1, 1)
+  end
+
+  it 'can coerce strings into times' do
+    coerced = Id::Coercion.coerce("01/01/2001", Time)
+    expect(coerced).to eq Time.new(2001, 1, 1)
+  end
+
+  it 'can coerce strings into booleans' do
+    coerced = Id::Coercion.coerce("yes", Id::Boolean)
+    expect(coerced).to be_true
+  end
+
   it 'can have new coercions added, even stupid ones' do
     Id::Coercion.register(Fixnum, String) { |value| (value + 1).to_s }
     coerced = Id::Coercion.coerce(2, String)

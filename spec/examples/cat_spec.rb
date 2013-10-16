@@ -6,8 +6,9 @@ class Cat
   include Id::Model
 
   field :name
-  field :paws, type: Integer
-  field :mice, type: Array[Mouse]
+  field :paws,     type: Integer
+  field :mice,     type: Array[Mouse]
+  field :friendly, type: Id::Boolean
 end
 
 describe Cat do
@@ -27,4 +28,10 @@ describe Cat do
     cat.mice.each { |mouse| expect(mouse).to be_a Mouse }
   end
 
+  it 'is either friendly or unfriendly' do
+    cat = Cat.new(friendly: 'yes')
+    expect(cat).to be_friendly
+    cat = Cat.new(friendly: 'nope')
+    expect(cat).not_to be_friendly
+  end
 end
