@@ -1,25 +1,38 @@
 module Id::Field
 
   def field(name, options = {})
+    define_field!(name, options)
+    define_existence_check!(name)
+  end
+
+  private
+
+  def define_field!(name, options)
     send :define_method, name do
       memoized = instance_variable_get "@#{name}"
       return memoized unless memoized.nil?
 
       key      = options.fetch(:key, name.to_s)
       type     = options.fetch(:type, Object)
-      optional = options.fetch(:optional, false)
+
       default  = options.fetch(:default, nil)
       default  = default.call if default.is_a? Proc
 
       value = data.fetch(key, default)
-      fail Id::MissingAttributeError, [self, name] if value.nil? && !optional
+      value = Option[value] if options.fetch(:optional, false)
 
-      value = Id::Coercion.coerce(value, type, optional)
+      fail Id::MissingAttributeError, [self, name] if value.nil?
+
+      value = Id::Coercion.coerce(value, type)
       value.tap { |value| instance_variable_set "@#{name}", value }
     end
   end
 
-  private
+  def define_existence_check!(name)
+    send :define_method, "#{name}?" do
+      !send(name).is_a? None rescue false
+    end
+  end
 
 end
 

@@ -19,7 +19,6 @@ describe Id::Field do
       c = Class.new { include Id::Model ; field :cats, type: Integer }.new(cats: "3")
       expect(c.cats).to eq 3
     end
-
   end
 
   describe 'defaults' do
@@ -48,4 +47,12 @@ describe Id::Field do
     end
 
   end
+
+  it 'can test for the presence of values' do
+    c = Class.new { include Id::Model ; field :foo }.new
+    expect(c.foo?).to be_false
+    d = c.set(foo: 4)
+    expect(d.foo?).to be_true
+  end
+
 end
