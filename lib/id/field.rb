@@ -19,27 +19,14 @@ module Id::Field
 
   def define_field!(definition)
     send :define_method, definition.name do
-      memoized = instance_variable_get "@#{definition.name}"
-      return memoized unless memoized.nil?
-
-      value = data.fetch(definition.key, definition.default!)
-      value = Option[value] if definition.optional?
-
-      fail Id::MissingAttributeError, [self, definition] if value.nil?
-
-      value = Id::Coercion.coerce(value, definition.type)
-      value.tap { |value| instance_variable_set "@#{definition.name}", value }
+      _data[definition.key] or fail Id::MissingAttributeError, [self, definition]
     end
   end
 
   def define_predicate!(definition)
     send :define_method, "#{definition.name}?" do
-      begin
-        value = send(definition.name)
-        !!value && !value.is_a?(None)
-      rescue Id::MissingAttributeError
-        false
-      end
+      value = _data[definition.key]
+      value && !value.is_a?(None)
     end
   end
 

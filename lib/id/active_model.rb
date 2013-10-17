@@ -6,8 +6,9 @@ class Id::ActiveModel
     :id
   end
 
-  def initialize(model)
+  def initialize(model, data)
     @model = model
+    @data = data
   end
 
   def persisted?
@@ -26,8 +27,8 @@ class Id::ActiveModel
 
   def method_missing(name, *args, &block)
     field = model.fields[name]
-    field.nil? ? model.send(name, *args, &block) : model.data[field.key]
+    field.nil? ? model.send(name, *args, &block) : data[field.key]
   end
 
-  attr_reader :model
+  attr_reader :model, :data
 end

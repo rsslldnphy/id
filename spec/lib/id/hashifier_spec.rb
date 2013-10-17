@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Id::Hashifier do
 
   it 'enhashes nested hashes of id models' do
-    t = Class.new { include Id::Model }
+    t = Class.new { include Id::Model ; field :waggy }
     c = Class.new { include Id::Model ; has_one :tail, type: t }
     cat = c.new(tail: {waggy: false})
     expect(Id::Hashifier.enhash cat).to eq("tail" => { "waggy" => false })
