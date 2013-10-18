@@ -1,7 +1,7 @@
 module Id::Form
 
   def active_model
-    @active_model ||= form_class.new(self)
+    @active_model ||= form_class.new(self, _data)
   end
 
   def as_form
