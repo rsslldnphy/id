@@ -9,6 +9,10 @@ module Id::Form
     to_model
   end
 
+  def persisted?
+    false
+  end
+
   delegate :valid?, :errors, to: :active_model
 
   private
@@ -19,7 +23,7 @@ module Id::Form
   def self.included(base)
     base.send :include, ActiveModel::Conversion
     base.send :extend,  Id::Validations, Id::FormBackwardsCompatibility
-    base.send :extend,  ActiveModel::Naming unless base.respond_to?(:model_name)
+    base.send :extend,  ActiveModel::Naming
     base.send :alias_method, :to_model, :active_model
 
     base.define_singleton_method :form_class do

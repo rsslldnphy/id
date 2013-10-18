@@ -11,17 +11,20 @@ describe Id::Form do
     expect(FormTest.new.to_model.class.model_name).to eq 'FormTest'
   end
 
-  class FormTest2
-    include Id::Model
-    include Id::Form
+  module Enclosing
+    class FormTest2
+      include Id::Model
+      include Id::Form
 
-    def self.model_name
-      'Harry'
+      def self.model_name
+        ActiveModel::Name.new(self, nil, "Harry")
+      end
     end
   end
 
   it "defers to the class' implementation of model_name if it has one" do
-    expect(FormTest2.new.to_model.class.model_name).to eq 'Harry'
+    expect(Enclosing::FormTest2.new.to_model.class.model_name).to eq 'Harry'
+    expect(Enclosing::FormTest2.new.to_model.class.model_name.plural).to eq 'harries'
   end
 
   class FormTest3

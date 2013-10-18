@@ -11,10 +11,6 @@ class Id::ActiveModel
     @data = data
   end
 
-  def persisted?
-    true
-  end
-
   def to_partial_path
     model.respond_to?(:to_partial_path) ? model.to_partial_path : super
   end
