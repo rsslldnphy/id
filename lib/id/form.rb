@@ -19,6 +19,7 @@ module Id::Form
   def self.included(base)
     base.send :include, ActiveModel::Conversion
     base.send :extend,  ActiveModel::Naming, Id::Validations
+    base.send :extend,  Id::FormBackwardsCompatibility
     base.send :alias_method, :to_model, :active_model
 
     base.define_singleton_method :form_class do

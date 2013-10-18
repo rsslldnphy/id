@@ -50,6 +50,19 @@ describe Id::Form do
     octopus = Octopus.new
     expect(octopus.as_form).to eq octopus.to_model
   end
+
+  class Cheetah
+    include Id::Model
+    include Id::Form
+    field :foo
+    form do
+      validates_presence_of :foo
+    end
+  end
+
+  it 'still allows the use of form, but this is deprecated' do
+    expect(Cheetah.new).not_to be_valid
+  end
 end
 
 
