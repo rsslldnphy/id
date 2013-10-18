@@ -51,3 +51,18 @@ describe Id::Form do
     expect(octopus.as_form).to eq octopus.to_model
   end
 end
+
+
+describe Id::FormBuilder do
+  it 'calls to_model on id models used as form objects' do
+    cat = Class.new { include Id::Model ; field :foo }.new
+    cat.expects(:to_model).returns(cat)
+    builder = Id::FormBuilder.new('cat', cat, 'cat.html.erb', {})
+  end
+
+  it 'does not call to_model on other objects' do
+    dog = Class.new.new
+    dog.expects(:to_model).never
+    builder = Id::FormBuilder.new('dog', dog, 'dog.html.erb', {})
+  end
+end

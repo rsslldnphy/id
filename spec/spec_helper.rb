@@ -6,6 +6,7 @@ SimpleCov.start do
   add_filter 'spec'
 end
 
+require 'spec/support/dummy_rails_form_builder'
 require 'id'
 
 RSpec.configure do |c|
