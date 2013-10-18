@@ -31,3 +31,12 @@ module Id::Form
   end
 
 end
+
+if defined?(ActionView::Helpers::FormBuilder)
+  class Id::FormBuilder < ActionView::Helpers::FormBuilder
+    def initialize(object_name, object, template, options)
+      object = object.is_a?(Id::Model) ? object.to_model : object
+      super object_name, object, template, options
+    end
+  end
+end

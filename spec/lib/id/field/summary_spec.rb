@@ -9,18 +9,18 @@ module Id::Field
                                              type: String,
                                              default: -> { "KITTEH!"})
       summary = definition.to_s
-      expect(summary).to eq "Name:\t\tcats\n"   +
-                            "Type:\t\tString\n" +
-                            "Key in hash:\tkittens\n" +
-                            "Optional:\ttrue\n" +
-                            "Default:\tLambda"
+      expect(summary).to eq "Name: cats\n"   +
+                            "Type: String\n" +
+                            "Key in hash: kittens\n" +
+                            "Optional: true\n" +
+                            "Default: Lambda"
     end
 
     it 'omits info for options that are not specified' do
       definition = Id::Field::Definition.new(:cats, type: String)
       summary = definition.to_s
-      expect(summary).to eq "Name:\t\tcats\n"   +
-                            "Type:\t\tString"
+      expect(summary).to eq "Name: cats\n"   +
+                            "Type: String"
     end
   end
 end

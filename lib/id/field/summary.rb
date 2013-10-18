@@ -12,24 +12,24 @@ module Id::Field
     attr_reader :definition
 
     def name
-      "Name:\t\t#{definition.name}"
+      "Name: #{definition.name}"
     end
 
     def type
-      "Type:\t\t#{definition.type}" unless definition.type == Object
+      "Type: #{definition.type}" unless definition.type == Object
     end
 
     def key
-      "Key in hash:\t#{definition.key}" unless definition.key == definition.name.to_s
+      "Key in hash: #{definition.key}" unless definition.key == definition.name.to_s
     end
 
     def optional
-      "Optional:\ttrue" if definition.optional?
+      "Optional: true" if definition.optional?
     end
 
     def default
       default = definition.default
-      "Default:\t#{default.is_a?(Proc) ? 'Lambda' : default}" unless default.nil?
+      "Default: #{default.is_a?(Proc) ? 'Lambda' : default}" unless default.nil?
     end
   end
 end
