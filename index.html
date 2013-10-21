@@ -1,0 +1,242 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Id by rsslldnphy</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Id</h1>
+        <p class="header">Simple, immutable models based on hashes</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/rsslldnphy/id/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/rsslldnphy/id/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/rsslldnphy/id">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/rsslldnphy">rsslldnphy</a></p>
+
+
+      </header>
+      <section>
+        <h1>
+<a name="id" class="anchor" href="#id"><span class="octicon octicon-link"></span></a>id</h1>
+
+<h3>
+<a name="simple-immutable-models-based-on-hashes" class="anchor" href="#simple-immutable-models-based-on-hashes"><span class="octicon octicon-link"></span></a>simple, immutable models based on hashes</h3>
+
+<p>JSON is a great way to transfer data between systems, and it's easy to parse into a Ruby hash. But sometimes it's nice to have actual methods to call when you want to get attributes from your data, rather than coupling your entire codebase to the hash representation by littering it with calls to <code>fetch</code> or <code>[]</code>. The same goes for BSON documents stored in Mongo.</p>
+
+<p>That's where <code>id</code> (as in Freud) comes in. You define your model classes using syntax that should look pretty familiar if you've used any popular Ruby ORMs - but <code>id</code> is not an ORM. Model objects defined with <code>id</code> have a constructor that accepts a hash, and you define the values of this hash that are made readable as fields, but that hash can come from any source.</p>
+
+<h4>
+<a name="defining-a-model" class="anchor" href="#defining-a-model"><span class="octicon octicon-link"></span></a>Defining a model</h4>
+
+<p>To define a model, include the <code>Id::Model</code> module in your class.</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">Cat</span>
+  <span class="kp">include</span> <span class="ss">Id</span><span class="p">:</span><span class="ss">:Model</span>
+<span class="k">end</span>
+</pre></div>
+
+<h4>
+<a name="defining-fields" class="anchor" href="#defining-fields"><span class="octicon octicon-link"></span></a>Defining fields</h4>
+
+<p>At its most basic, you can define a field like this:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">Cat</span>
+  <span class="n">field</span> <span class="ss">:name</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>This gives you the equivalent of an <code>attr_reader</code> for that field, as well as a predicate method which checks if it has been set (in the case of boolean fields, this predicate method also checks the value of that field - nil is interpreted as false).</p>
+
+<div class="highlight highlight-ruby"><pre><span class="n">cat</span> <span class="o">=</span> <span class="no">Cat</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s2">"Travis"</span><span class="p">)</span>
+<span class="n">cat</span><span class="o">.</span><span class="n">name</span>  <span class="c1"># =&gt; "Travis"</span>
+<span class="n">cat</span><span class="o">.</span><span class="n">name?</span> <span class="c1"># =&gt; true</span>
+
+<span class="n">cat</span> <span class="o">=</span> <span class="no">Cat</span><span class="o">.</span><span class="n">new</span>
+<span class="n">cat</span><span class="o">.</span><span class="n">name?</span> <span class="c1"># =&gt; false</span>
+</pre></div>
+
+<h6>
+<a name="what-happens-if-you-try-to-access-a-field-that-hasnt-been-set" class="anchor" href="#what-happens-if-you-try-to-access-a-field-that-hasnt-been-set"><span class="octicon octicon-link"></span></a>What happens if you try to access a field that hasn't been set?</h6>
+
+<div class="highlight highlight-ruby"><pre><span class="n">irb</span><span class="p">(</span><span class="n">main</span><span class="p">):</span><span class="mo">007</span><span class="p">:</span><span class="mi">0</span><span class="o">&gt;</span> <span class="no">Cat</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">name</span>
+  <span class="ss">Id</span><span class="p">:</span><span class="ss">:MissingAttributeError</span><span class="p">:</span> <span class="no">Cat</span> <span class="n">had</span> <span class="n">a</span> <span class="kp">nil</span> <span class="n">value</span> <span class="k">for</span> <span class="s1">'name'</span><span class="o">.</span>
+</pre></div>
+
+<p>Id is allergic to <code>nil</code>, and refuses to return it. If you want to access a field you need to be sure it's there, or you'll get an error. This means if you have a bug in your code and a field isn't set, you'll find out as soon as possible, rather that letting a <code>nil</code> leak out and cause an <code>undefined method 'foo' for nil:NilClass</code> at some unspecified future point, from where it might be hard to track down the source of the problem.</p>
+
+<h6>
+<a name="what-about-optional-fields" class="anchor" href="#what-about-optional-fields"><span class="octicon octicon-link"></span></a>What about optional fields?</h6>
+
+<p>Sometimes fields really are optional. In this case you can either test for their presence using the predicate methods (which is a bit ugly, but at least forces you to deal with the empty case), or you can mark the field as <code>optional: true</code>, which will make them return an <code>Option</code> type rather than a raw value.</p>
+
+<p><code>Option</code> types are a pattern found in many functional languages (the <code>Option</code> type in Scala, the <code>Maybe</code> monad in Haskell) and the Ruby implementation used by id can be found <a href="http://github.com/rsslldnphy/optional">here</a>.</p>
+
+<h6>
+<a name="can-i-set-default-values" class="anchor" href="#can-i-set-default-values"><span class="octicon octicon-link"></span></a>Can I set default values?</h6>
+
+<p>Yes. Default values are specified like this:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">Cat</span>
+  <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+  <span class="n">field</span> <span class="ss">:paws</span><span class="p">,</span> <span class="ss">default</span><span class="p">:</span> <span class="mi">4</span>
+<span class="k">end</span>
+
+<span class="no">Cat</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">paws</span> <span class="c1"># =&gt; 4</span>
+</pre></div>
+
+<p>You can also specify lambda defaults. These will be run on initialization of an instance of your model.</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">Cat</span>
+  <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+  <span class="n">field</span> <span class="ss">:birthday</span><span class="p">,</span> <span class="ss">default</span><span class="p">:</span> <span class="o">-&gt;</span> <span class="p">{</span> <span class="no">Date</span><span class="o">.</span><span class="n">new</span> <span class="p">}</span>
+<span class="k">end</span>
+
+<span class="no">Cat</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">birthday</span> <span class="c1"># =&gt; #&lt;Date: 2013-10-21 ((2456587j,0s,0n),+0s,2299161j)&gt;</span>
+</pre></div>
+
+<h6>
+<a name="i-dont-like-the-key-names-in-my-data-source--" class="anchor" href="#i-dont-like-the-key-names-in-my-data-source--"><span class="octicon octicon-link"></span></a>I don't like the key names in my data-source :-(</h6>
+
+<p>We don't always get what we want. But don't despair! If the hash you're using to create your models has badly named keys - e.g., horror of horrors, keys in camelCase - you can use key aliases to convert them to nice, succinct, Rubyish identifiers:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">Camel</span>
+  <span class="kp">include</span> <span class="ss">Id</span><span class="p">:</span><span class="ss">:Model</span>
+
+  <span class="n">field</span> <span class="ss">:name</span><span class="p">,</span>  <span class="ss">key</span><span class="p">:</span> <span class="s1">'camelName'</span>
+  <span class="n">field</span> <span class="ss">:humps</span><span class="p">,</span> <span class="ss">key</span><span class="p">:</span> <span class="s1">'camelHumps'</span>
+<span class="k">end</span>
+
+<span class="no">Camel</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">'camelName'</span> <span class="o">=&gt;</span> <span class="s1">'Terry'</span><span class="p">)</span><span class="o">.</span><span class="n">name</span> <span class="c1"># =&gt; "Terry"</span>
+</pre></div>
+
+<h4>
+<a name="type-coercion" class="anchor" href="#type-coercion"><span class="octicon octicon-link"></span></a>Type Coercion</h4>
+
+<p>Id can coerce your fields into a number of basic types. Just specify the type you want as part of the field definition.</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">Cat</span>
+  <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+  <span class="n">field</span> <span class="ss">:paws</span><span class="p">,</span> <span class="ss">type</span><span class="p">:</span> <span class="nb">Integer</span>
+<span class="k">end</span>
+
+<span class="no">Cat</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">paws</span><span class="p">:</span> <span class="s2">"3"</span><span class="p">)</span><span class="o">.</span><span class="n">paws</span> <span class="o">=&gt;</span> <span class="mi">3</span>
+<span class="no">Cat</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">paws</span><span class="p">:</span> <span class="s2">"3"</span><span class="p">)</span><span class="o">.</span><span class="n">paws</span><span class="o">.</span><span class="n">class</span> <span class="o">=&gt;</span> <span class="nb">Integer</span>
+</pre></div>
+
+<p>You can typecast array elements like this:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="n">field</span> <span class="ss">:counts</span><span class="p">,</span> <span class="ss">type</span><span class="p">:</span> <span class="nb">Array</span><span class="o">[</span><span class="nb">Integer</span><span class="o">]</span>
+</pre></div>
+
+<p>Because Ruby doesn't have a <code>Boolean</code> type (weird, right?), if you want to coerce something to either <code>true</code> or <code>false</code>, you need to use <code>Id::Boolean</code>, like this:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="n">field</span> <span class="ss">:admin</span><span class="p">,</span> <span class="ss">type</span><span class="p">:</span> <span class="ss">Id</span><span class="p">:</span><span class="ss">:Boolean</span>
+</pre></div>
+
+<p>And if you need to coerce a type id doesn't yet support, such as a custom type of your own, you can register new coercions by passing the "from" type, "to" type, and a block to perform the conversion to <code>Id::Coercion.register</code>.</p>
+
+<div class="highlight highlight-ruby"><pre><span class="ss">Id</span><span class="p">:</span><span class="ss">:Coercion</span><span class="o">.</span><span class="n">register</span> <span class="nb">String</span><span class="p">,</span> <span class="no">Money</span> <span class="k">do</span> <span class="o">|</span><span class="n">value</span><span class="o">|</span>
+  <span class="n">value</span><span class="o">.</span><span class="n">to_money</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>or more succinctly:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="ss">Id</span><span class="p">:</span><span class="ss">:Coercion</span><span class="o">.</span><span class="n">register</span> <span class="nb">String</span><span class="p">,</span> <span class="no">Money</span><span class="p">,</span> <span class="o">&amp;</span><span class="ss">:to_money</span>
+</pre></div>
+
+<h4>
+<a name="associations" class="anchor" href="#associations"><span class="octicon octicon-link"></span></a>Associations</h4>
+
+<p>If you have nested arrays or hashes in your source, you can define id models for them in turn, and treat them much like you would associations in an ORM, by defining them as <code>has_one</code> or <code>has_many</code> associations on the parent model.</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">Lion</span>
+  <span class="kp">include</span> <span class="ss">Id</span><span class="p">:</span><span class="ss">:Model</span>
+  <span class="n">field</span> <span class="ss">:name</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Person</span>
+  <span class="kp">include</span> <span class="ss">Id</span><span class="p">:</span><span class="ss">:Model</span>
+  <span class="n">field</span> <span class="ss">:name</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Zoo</span>
+  <span class="kp">include</span> <span class="ss">Id</span><span class="p">:</span><span class="ss">:Model</span>
+
+  <span class="n">has_many</span> <span class="ss">:lions</span>
+  <span class="n">has_one</span> <span class="ss">:zookeeper</span><span class="p">,</span> <span class="ss">type</span><span class="p">:</span> <span class="no">Person</span>
+<span class="k">end</span>
+
+<span class="n">zoo</span> <span class="o">=</span> <span class="no">Zoo</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">lions</span><span class="p">:</span> <span class="o">[</span><span class="p">{</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'Hetty'</span><span class="p">}</span><span class="o">]</span><span class="p">,</span>
+              <span class="ss">zookeeper</span><span class="p">:</span> <span class="p">{</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'Russell'</span><span class="p">})</span>
+
+<span class="n">zoo</span><span class="o">.</span><span class="n">lions</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">class</span> <span class="c1"># =&gt; Lion</span>
+<span class="n">zoo</span><span class="o">.</span><span class="n">lions</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">name</span>  <span class="c1"># =&gt; "Hetty"</span>
+<span class="n">zoo</span><span class="o">.</span><span class="n">zookeeper</span><span class="o">.</span><span class="n">class</span>   <span class="c1"># =&gt; Person</span>
+<span class="n">zoo</span><span class="o">.</span><span class="n">zookeeper</span><span class="o">.</span><span class="n">name</span>    <span class="c1"># =&gt; "Russell"</span>
+</pre></div>
+
+<p>Types are inferred from the association name unless specified.</p>
+
+<h4>
+<a name="designed-for-immutability" class="anchor" href="#designed-for-immutability"><span class="octicon octicon-link"></span></a>Designed for immutability</h4>
+
+<p><code>id</code> models provide accessor methods, but no mutator methods, because they are designed for immutability. How do immutable models work? When you need to change some field of a model object, a new copy of the object is created with the field changed as required. This is handled for you by <code>id</code>'s <code>set</code> method:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="n">person1</span> <span class="o">=</span> <span class="no">Person</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'Russell'</span><span class="p">,</span> <span class="ss">job</span><span class="p">:</span> <span class="s1">'programmer'</span><span class="p">)</span>
+<span class="n">person2</span> <span class="o">=</span> <span class="n">person1</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">'Radek'</span><span class="p">)</span>
+<span class="n">person1</span><span class="o">.</span><span class="n">name</span> <span class="c1"># =&gt; 'Russell'</span>
+<span class="n">person2</span><span class="o">.</span><span class="n">name</span> <span class="c1"># =&gt; 'Radek'</span>
+<span class="n">person2</span><span class="o">.</span><span class="n">job</span>  <span class="c1"># =&gt; 'programmer'</span>
+</pre></div>
+
+<p>Obviously, this is Ruby, and if you really want to mutate some of the internal state of an id model you will be able to find a way to do it. Don't do it!</p>
+
+<h4>
+<a name="id-and-rails" class="anchor" href="#id-and-rails"><span class="octicon octicon-link"></span></a>Id and Rails</h4>
+
+<p>We might not love everything about Rails, but we probably use it at least some of the time. So does id play nicely with it?</p>
+
+<p>With a few modifications, yes. Models that blow up at the sight of <code>nil</code> don't play happy with Rails' <code>nil</code>-happy forms, but you can make your id models active model compliant in forms, while otherwise retaining the <code>nil</code>-allergy in the rest of your code, by doing two things.</p>
+
+<p>Include the <code>Id::Form</code> module in your model.</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">Cat</span>
+  <span class="kp">include</span> <span class="ss">Id</span><span class="p">:</span><span class="ss">:Model</span>
+  <span class="kp">include</span> <span class="ss">Id</span><span class="p">:</span><span class="ss">:Form</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>Add the following line to <code>config/application.rb</code>:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="n">config</span><span class="o">.</span><span class="n">action_view</span><span class="o">.</span><span class="n">default_form_builder</span> <span class="o">=</span> <span class="ss">Id</span><span class="p">:</span><span class="ss">:FormBuilder</span>
+</pre></div>
+
+<h3>
+<a name="timestamps" class="anchor" href="#timestamps"><span class="octicon octicon-link"></span></a>Timestamps</h3>
+
+<p>And finally, it's reasonably common to want to know when a particular model was created and/or updated. Id provides you this functionality out of the box through the <code>Id::Timestamps</code> module. Just include it to your model to get <code>created_at</code> and <code>updated_at</code> fields that behave as you would expect.</p>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>
