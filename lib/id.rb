@@ -9,6 +9,8 @@ require 'active_support/core_ext/hash/keys'
 require 'active_model'
 require 'optional'
 require 'delegate'
+require 'date'
+require 'time'
 
 require 'id/boolean'
 require 'id/coercion'
