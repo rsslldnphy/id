@@ -30,7 +30,9 @@ module Id::Form
       base = self
       @form_class ||= Class.new(Id::ActiveModel) do
         eigenclass = class << self; self end
-        eigenclass.send(:define_method, :model_name, &base.method(:model_name))
+        eigenclass.send :define_method, :model_name do
+          base.send(:model_name)
+        end
       end
     end
   end
