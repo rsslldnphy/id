@@ -196,6 +196,8 @@ Add the following line to `config/application.rb`:
 config.action_view.default_form_builder = Id::FormBuilder
 ```
 
+With `Id::Form` included you can use Active Model validations as normal, and override methods like `to_partial_path`, `self.model_name`, and `persisted?` right there in your model.
+
 ### Timestamps
 
 And finally, it's reasonably common to want to know when a particular model was created and/or updated. Id provides you this functionality out of the box through the `Id::Timestamps` module. Just include it to your model to get `created_at` and `updated_at` fields that behave as you would expect.
