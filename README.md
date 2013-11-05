@@ -1,5 +1,5 @@
 # id
-### simple models based on hashes
+### simple, immutable models based on hashes
 
 JSON is a great way to transfer data between systems, and it's easy to parse into a Ruby hash. But sometimes it's nice to have actual methods to call when you want to get attributes from your data, rather than coupling your entire codebase to the hash representation by littering it with calls to `fetch` or `[]`. The same goes for BSON documents stored in Mongo.
 
