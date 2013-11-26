@@ -30,6 +30,10 @@ module Id::Model
     @data ||= Id::Hashifier.enhash(_data)
   end
 
+  def match(&block)
+    Id::Match.new(self)._evaluate(&block)
+  end
+
   alias_method :to_hash, :data
 
   protected

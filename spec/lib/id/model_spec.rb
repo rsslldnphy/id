@@ -43,4 +43,5 @@ describe Id::Model do
     expect(hash[d]).to eq 10
     expect(hash[e]).to eq 12
   end
+
 end
