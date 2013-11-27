@@ -38,6 +38,7 @@ GEM
       i18n (~> 0.6.0)
     multi_json (1.7.3)
     optional (0.0.7)
+    rake (10.1.0)
     rest-client (1.6.7)
       mime-types (>= 1.16)
     rspec (2.13.0)
@@ -68,6 +69,7 @@ DEPENDENCIES
   coveralls
   id!
   mocha
+  rake
   rspec
   simplecov
   test-unit
