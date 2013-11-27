@@ -4,7 +4,6 @@ PATH
     id (0.1)
       activemodel
       activesupport
-      money
       optional
 
 GEM
@@ -69,6 +68,7 @@ DEPENDENCIES
   coveralls
   id!
   mocha
+  money
   rake
   rspec
   simplecov
