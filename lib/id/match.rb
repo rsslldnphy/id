@@ -24,8 +24,11 @@ class Id::Match
     model(*args, &block) if name.to_s.titlecase == _model.class.name
   end
 
-  def _superset?(query)
-    query.all? { |k, v| v === _model.data[k.to_s] }
+  def _superset?(query, model=_model)
+    query.all? do |k, v|
+      field = model.fields[k]
+      v === field.value(model.data) unless field.nil?
+    end
   end
 end
 

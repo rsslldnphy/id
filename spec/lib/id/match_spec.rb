@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'id/symbol_to_proc'
 
 describe Id::Match do
   let (:c) { Class.new { include Id::Model; field :foo; field :bar } }
@@ -75,6 +76,16 @@ describe Id::Match do
     end
   end
 
+  context 'matching based on procs - works iff the optional id/symbol_to_proc has been required' do
+    it 'if a proc is specified for a field, it matches if the proc returns true' do
+      result = c.new(foo: "cat").match do |m|
+        m.model(foo: ~:present?) { "matches foo as it is present" }
+        m.model(foo: ~:blank?)   { "matches foo as it is blank"   }
+      end
+      expect(result).to eq "matches foo as it is present"
+    end
+  end
+
   context 'matching based on class' do
 
     class Cat
@@ -97,6 +108,20 @@ describe Id::Match do
         m.cat(name: "Bryan Ferry") { "matched bryan ferry" }
       end
       expect(result).to eq 'matched terry'
+    end
+  end
+
+  context 'when the model has key aliases' do
+    class Foo
+      include Id::Model
+      field :foo, key: 'trouser'
+    end
+    it 'still works - and the field name, not key alias, must be specified' do
+      result = Foo.new(trouser: 5).match do |m|
+        m.foo(trouser: 5) { "matched trouser" }
+        m.foo(foo: 5)     { "matched foo"     }
+      end
+      expect(result).to eq 'matched foo'
     end
   end
 
