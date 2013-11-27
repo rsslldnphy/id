@@ -125,6 +125,25 @@ describe Id::Match do
     end
   end
 
+  context 'nested matching' do
+    class Bar
+      include Id::Model
+      field :baz
+    end
+    class Quux
+      include Id::Model
+      field :foo
+      has_one :bar
+    end
+    it 'can match on arbitrarily nested patterns of id models' do
+      result = Quux.new(foo: 3, bar: { baz: 12 }).match do |m|
+        m.quux(foo: 2, bar: { baz: 12 })              { "doesn't match" }
+        m.quux(foo: 3, bar: { baz: ->(x) { x > 11 }}) { "matches with nested lambda" }
+      end
+      expect(result).to eq 'matches with nested lambda'
+    end
+  end
+
   context 'using data internal to the model being matched' do
     it 'gives access to the internal data of the model when evaluating a match' do
       result = c.new(foo: 3, bar: 5).match do |m|

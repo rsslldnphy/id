@@ -9,8 +9,8 @@ class Id::Match
     _result or fail BadMatchError, _model
   end
 
-  def model(query = {}, &block)
-    @_result ||= _model.instance_eval(&block) if _superset?(query)
+  def model(match = {}, &block)
+    @_result ||= _model.instance_eval(&block) if _model === match
   end
 
   def _(&block)
@@ -22,13 +22,6 @@ class Id::Match
 
   def method_missing(name, *args, &block)
     model(*args, &block) if name.to_s.titlecase == _model.class.name
-  end
-
-  def _superset?(query, model=_model)
-    query.all? do |k, v|
-      field = model.fields[k]
-      v === field.value(model.data) unless field.nil?
-    end
   end
 end
 

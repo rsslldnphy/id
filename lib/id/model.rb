@@ -17,7 +17,18 @@ module Id::Model
     self.class.new(updated)
   end
 
-  def eql? other
+  def ===(other)
+    match = other.is_a?(Id::Model) ? other.data : other
+    match.all? do |k, v|
+      field = fields[k]
+      if field.present?
+        value = field.value(data)
+        v.is_a?(Hash) && value.is_a?(Id::Model) ? value === v : v === value
+      end
+    end
+  end
+
+  def eql?(other)
     other.is_a?(Id::Model) && other._data.eql?(self._data)
   end
   alias_method :==, :eql?
