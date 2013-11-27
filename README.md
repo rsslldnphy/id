@@ -202,6 +202,109 @@ config.action_view.default_form_builder = Id::FormBuilder
 
 With `Id::Form` included you can use Active Model validations as normal, and override methods like `to_partial_path`, `self.model_name`, and `persisted?` right there in your model.
 
+### Pattern-matching!
+
+What happens if you get really into functional languages, but still write Ruby as your main language? You get endlessly frustrated at Ruby's lack of pattern matching and try to implement a sort of kind of type of pattern-matching yourself, that's what.
+In case you haven't come across the idea of pattern-matching before, it basically allows you to both make decisions based on the structure and content of a piece of data, as well as extracting (or destructuring) that data to get at the bits you want.
+
+The Id implementation is nowhere near as elegant and powerful as proper pattern matching in something like Haskell, but it has some nice features, I think.
+You use it by calling `match` on an id model and then defining patterns to match against and blocks to evaluate if matched. Here's how:
+
+```ruby
+class Bar
+  include Id::Model
+  field :baz
+end
+class Foo
+  include Id::Model
+  field :foo
+  has_one :bar
+end
+
+f = Foo.new(foo: "Catapult", bar: { baz: "HELLO!" })
+f.match do |m|
+  m.model(foo: "Dogapult")                         { "What's a dogapult?" }
+  m.model(foo: "Catapult")                         { "Foo is a catapult!" }
+  m.model(foo: "Catapult", bar: { baz: "HELLO!" }) { "Foo is still a catapult!" }
+end # => "Foo is a catapult!"
+```
+
+As you can see, matches are made only on the keys present in the match criteria, and the first match wins. You can also construct arbitrarily deeply nested matches if your id models have associations.
+
+#### What happens if there's no match?
+
+You get a `BadMatchError`. If you don't want a `BadMatchError` and need a catchall case, you can use the underscore wildcard case like this:
+
+```ruby
+f.match do |m|
+  m.model(foo: "Dogapult") { "A DOGAPULT!!1" }
+  m._                      { "No dogapult, but that's what I wanted :-(" }
+end # => "No dogapult, but that's what I wanted :-("
+```
+
+#### Why `m.model`?
+
+The call above is `m.model` as `model` is the generic way to construct a match on an id model.
+However, if you want to be more explicit in your code, or you want to match only a particular class of models, you use that class's name, in snakecase, in place of `model`.
+
+So the example above could be rewritten as `m.foo`.
+
+#### What other cool stuff can I do?
+
+The matches in an id pattern-match are done using `===` (which is also used in case statements), which gives you some powerful options for specifying matches based on ranges, regexes, and procs:
+
+```ruby
+p = Person.new(age: 15)
+p.match do |m|
+  m.person(age: 0..12)  { "Infant"   }
+  m.person(age: 13..19) { "Teenager" }
+  m._                   { "Adult"    }
+end # => "Teenager"
+
+p = Person.new(name: "Russell")
+p.match do |m|
+  m.person(name: /Russ.*/) { "Hello, Russ!" }
+end # => "Hello, Russ!"
+
+p = Person.new(name: "")
+p.match do |m|
+  m.person(name: ->(n) { n.empty? }) { "You need to give a name" }
+end
+```
+
+Notice, in the last example, how the lambda syntax is a bit clunky as part of a match? For single method calls on the value, with no extra arguments, you can make it slightly nicer by calling `to_proc` on the symbol of the method name instead:
+
+```ruby
+p.match do |m|
+  m.person(name: :empty?.to_proc) { "You need to give a name" }
+end
+```
+
+But that's still not that beatiful.. so if you want, you can require `id/symbol_to_proc` (which is optional to give you the choice about monkey-patching core classes, as id wants to be polite) to make the unary method `~` an alias for `to_proc` on symbols. Then you can rewrite the above example like this:
+
+```ruby
+require 'id/symbol_to_proc'
+p.match do |m|
+  m.person(name: ~:empty?) { "You need to give a name" }
+end
+```
+
+Which is a bit nicer again. Thanks to @josevalim for posting the idea for this somewhere on the internet (I can't remember where).
+
+#### What about the 'de-structuring' thing you mentioned?
+
+Ok, this isn't quite destructuring, but you do get some of the benefits. The blocks that you pass to each match step are evaluated, if they match successfully, in the context of the model.
+So the internal state of the model is available to you inside those blocks - including the accessors for the keys you matched against.
+
+```ruby
+f = Foo.new(foo: "Dogapult!")
+f.match do |m|
+  m.model(foo: /Dog.*/) { "I'll accept anything related to dogs. Even a #{foo}" }
+end # => "I'll accept anything related to dogs. Even a Dogapult!"
+```
+
+The downside is that the match blocks are no longer evaluated in the context in which they are defined, so you can't use local variables and methods from outside the model. Something to watch out for.
+
 ### Timestamps
 
 And finally, it's reasonably common to want to know when a particular model was created and/or updated. Id provides you this functionality out of the box through the `Id::Timestamps` module. Just include it to your model to get `created_at` and `updated_at` fields that behave as you would expect.

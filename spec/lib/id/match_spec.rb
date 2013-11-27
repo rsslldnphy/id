@@ -74,6 +74,17 @@ describe Id::Match do
         expect(result).to eq "matches /ca?/"
       end
     end
+
+    context 'matching based on a range' do
+      it 'if a range is specified for a field, matches if that field is within the range' do
+        result = c.new(foo: 15).match do |m|
+          m.model(foo: 0..12)  { "matches infant"   }
+          m.model(foo: 13..19) { "matches teenager" }
+          m._                  { "matches adult"    }
+        end
+        expect(result).to eq "matches teenager"
+      end
+    end
   end
 
   context 'matching based on procs - works iff the optional id/symbol_to_proc has been required' do
