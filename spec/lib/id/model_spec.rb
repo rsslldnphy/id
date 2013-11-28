@@ -44,4 +44,11 @@ describe Id::Model do
     expect(hash[e]).to eq 12
   end
 
+  describe '#juxt' do
+    it 'calls each of the passed functions on its value, returning an array of the results' do
+      c = Class.new { include Id::Model ; field :cats; field :dogs }.new(cats: 3, dogs: 5)
+      result = c.juxt(:cats, :dogs, ->(x){ x.cats * x.dogs })
+      expect(result).to eq [3, 5, 15]
+    end
+  end
 end

@@ -45,7 +45,11 @@ module Id::Model
     Id::Match.new(self)._evaluate(&block)
   end
 
-  alias_method :to_hash, :data
+  alias to_hash data
+
+  def juxt(*methods)
+    methods.map { |m| m.to_proc.call(self) }
+  end
 
   protected
   attr_reader :_data
