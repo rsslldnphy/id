@@ -1,4 +1,4 @@
-Copyright (c) 2012 Russell Dunphy
+Copyright (c) 2013 Russell Dunphy
 
 MIT License
 

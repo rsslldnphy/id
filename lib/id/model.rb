@@ -1,5 +1,12 @@
 module Id::Model
 
+  def self.[](*keys)
+    Class.new do
+      include Id::Model
+      keys.each { |key| field key }
+    end
+  end
+
   def initialize(_data = {})
     @_data = fields.reduce({}) do |acc, (_, field)|
       acc.merge(field.key => field.value(_data))

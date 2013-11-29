@@ -7,6 +7,17 @@ describe Id::Model do
     expect(c.cats).to eq 3
   end
 
+  describe 'square bracket shorthand' do
+    it 'allows models to be defined succintly' do
+      Thingy = Id::Model[:foo, :bar, :baz]
+      thingy = Thingy.new(foo: 1, bar: 2, baz: 3)
+      expect(thingy).to be_an Id::Model
+      expect(thingy.foo).to eq 1
+      expect(thingy.bar).to eq 2
+      expect(thingy.baz).to eq 3
+    end
+  end
+
   it 'can have fields set on it after creation - creating a new instance' do
     c = Class.new { include Id::Model ; field :cats }.new(cats: 3)
     expect(c.cats).to eq 3
