@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name          = 'id'
-  s.version       = '0.1'
+  s.version       = '0.1.1'
   s.date          = '2013-03-28'
   s.summary       = "Simple models based on hashes"
   s.description   = "Easily convert hashes to Ruby objects. Originally developed at www.onthebeach.co.uk."

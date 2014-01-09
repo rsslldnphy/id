@@ -58,6 +58,15 @@ module Id::Model
     methods.map { |m| m.to_proc.call(self) }
   end
 
+  def to_s
+    name = self.class.name || "Id::Model"
+    data = fields.map do |name, definition|
+      "  #{name}: #{definition.value(_data).inspect}"
+    end.join("\n")
+    "#{name}[\n#{data}\n]"
+  end
+  alias inspect to_s
+
   protected
   attr_reader :_data
 

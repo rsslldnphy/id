@@ -62,4 +62,11 @@ describe Id::Model do
       expect(result).to eq [3, 5, 15]
     end
   end
+
+  describe '#to_s' do
+    it 'includes details on all the fields of the model' do
+      c = Class.new { include Id::Model ; field :cats; field :dogs }.new(cats: 3, dogs: 5)
+      expect(c.to_s).to eq "Id::Model[\n  cats: 3\n  dogs: 5\n]"
+    end
+  end
 end
