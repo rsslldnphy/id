@@ -36,3 +36,6 @@ Id::Coercion.register String, Float,       &:to_f
 Id::Coercion.register String, Date,        &Date.method(:parse)
 Id::Coercion.register String, Time,        &Time.method(:parse)
 Id::Coercion.register String, Id::Boolean, &Id::Boolean.method(:parse)
+Id::Coercion.register Fixnum, Id::Boolean, &Id::Boolean.method(:parse)
+Id::Coercion.register TrueClass, Id::Boolean, &Id::Boolean.method(:parse)
+Id::Coercion.register FalseClass, Id::Boolean, &Id::Boolean.method(:parse)

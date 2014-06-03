@@ -19,7 +19,9 @@ module Id::Field
 
   def define_field!(definition)
     send :define_method, definition.name do
-      _data[definition.key] or fail Id::MissingAttributeError, [self, definition]
+      _data[definition.key].tap do |value|
+        fail Id::MissingAttributeError, [self, definition] if value.nil?
+      end
     end
   end
 

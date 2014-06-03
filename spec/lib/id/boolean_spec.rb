@@ -31,8 +31,19 @@ describe Id::Boolean do
     expect(b).to be_true
   end
 
+  it 'parses trueclass as true' do
+    b = Id::Boolean.parse(true)
+    expect(b).to be_true
+  end
+
   it 'parses everything else as false' do
     b = Id::Boolean.parse(:cottage_cheese)
     expect(b).to be_false
   end
+
+  it 'works with default values' do
+    test_class = Class.new { include Id::Model; field :foo, type: Id::Boolean, default: false }
+    expect(test_class.new.foo).to be_false
+  end
+
 end
